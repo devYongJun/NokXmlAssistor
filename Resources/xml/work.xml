@@ -1,0 +1,64 @@
+<scene id="null" desc="null" width="1280" height="720" ratio="Custom">
+  <object id="" img="Image_Common\back.png" x="0" y="0" openglX="0" openglY="0" sourceAnchor="TL" layerAnchor="TL" offsetX="0" offsetY="0" alpha="1" lock="false"/>
+  <object id="" img="Image_Common\back_info1.png" x="18" y="147" openglX="18" openglY="12" sourceAnchor="TL" layerAnchor="TL" offsetX="18" offsetY="147" alpha="1" lock="true"/>
+  <object id="bg_gold" img="Image_Common\bk_top_BG.png" x="920" y="4" openglX="920" openglY="648" sourceAnchor="TL" layerAnchor="TL" offsetX="920" offsetY="4" alpha="1" lock="false"/>
+  <object id="btn_x" img="Image_Common\btn_x.png" x="1200" y="0" openglX="1200" openglY="638" sourceAnchor="TL" layerAnchor="TL" offsetX="1200" offsetY="0" alpha="1" lock="false"/>
+  <object id="bg_cash" img="Image_Common\bk_top_BG.png" x="646" y="4" openglX="646" openglY="648" sourceAnchor="TL" layerAnchor="TL" offsetX="646" offsetY="4" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_setBg_panel.png" x="19" y="77" openglX="19" openglY="13" sourceAnchor="TL" layerAnchor="TL" offsetX="19" offsetY="77" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_setTop_img.png" x="32" y="88" openglX="32" openglY="564" sourceAnchor="TL" layerAnchor="TL" offsetX="32" offsetY="88" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_set_panel.png" x="32" y="486" openglX="32" openglY="130" sourceAnchor="TL" layerAnchor="TL" offsetX="32" offsetY="486" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_set_panel.png" x="32" y="594" openglX="32" openglY="22" sourceAnchor="TL" layerAnchor="TL" offsetX="32" offsetY="594" alpha="1" lock="false"/>
+  
+  <object id="" img="Image_Work\work_set_panel.png" x="32" y="378" openglX="32" openglY="238" sourceAnchor="TL" layerAnchor="TL" offsetX="32" offsetY="378" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_set_panel.png" x="32" y="270" openglX="32" openglY="346" sourceAnchor="TL" layerAnchor="TL" offsetX="32" offsetY="270" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_set_panel.png" x="32" y="162" openglX="32" openglY="454" sourceAnchor="TL" layerAnchor="TL" offsetX="32" offsetY="162" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_question_img.png" x="97" y="167" openglX="97" openglY="455" sourceAnchor="TL" layerAnchor="TL" offsetX="97" offsetY="167" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_set_btn.png" x="40" y="234" openglX="40" openglY="457" sourceAnchor="TL" layerAnchor="TL" offsetX="40" offsetY="234" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_question_img.png" x="102" y="274" openglX="102" openglY="348" sourceAnchor="TL" layerAnchor="TL" offsetX="102" offsetY="274" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_set_btn.png" x="40" y="342" openglX="40" openglY="349" sourceAnchor="TL" layerAnchor="TL" offsetX="40" offsetY="342" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_question_img.png" x="102" y="384" openglX="102" openglY="238" sourceAnchor="TL" layerAnchor="TL" offsetX="102" offsetY="384" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_question_img.png" x="102" y="493" openglX="102" openglY="129" sourceAnchor="TL" layerAnchor="TL" offsetX="102" offsetY="493" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_set_btn.png" x="40" y="450" openglX="40" openglY="241" sourceAnchor="TL" layerAnchor="TL" offsetX="40" offsetY="450" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_set_btn.png" x="40" y="558" openglX="40" openglY="133" sourceAnchor="TL" layerAnchor="TL" offsetX="40" offsetY="558" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_question_img.png" x="102" y="600" openglX="102" openglY="22" sourceAnchor="TL" layerAnchor="TL" offsetX="102" offsetY="600" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_set_btn.png" x="40" y="666" openglX="40" openglY="25" sourceAnchor="TL" layerAnchor="TL" offsetX="40" offsetY="666" alpha="1" lock="false"/>
+  
+  <object id="" img="Image_Work\questionMark_s_icon.png" x="176" y="84" openglX="176" openglY="599" sourceAnchor="TL" layerAnchor="TL" offsetX="176" offsetY="84" alpha="1" lock="false"/>
+  
+  <object id="sp_tooltip" img="Image_Work\work_tooltip1_panel.png" x="51" y="114" openglX="51" openglY="467" sourceAnchor="TL" layerAnchor="TL" offsetX="51" offsetY="114" alpha="1" lock="false"/>
+  
+  
+  <object id="" img="Image_Common\btn_sub_s.png" x="231" y="80" openglX="231" openglY="574" sourceAnchor="TL" layerAnchor="TL" offsetX="231" offsetY="80" alpha="1" lock="false"/>
+  <object id="btn_sub_0" img="Image_Common\btn_sub_select_s.png" x="231" y="80" openglX="231" openglY="574" sourceAnchor="TL" layerAnchor="TL" offsetX="231" offsetY="80" alpha="1" lock="false"/>
+  
+  
+  <object id="" img="Image_Common\btn_sub_s.png" x="367" y="80" openglX="367" openglY="574" sourceAnchor="TL" layerAnchor="TL" offsetX="367" offsetY="80" alpha="1" lock="false"/>
+  <object id="btn_sub_1" img="Image_Common\btn_sub_select_s.png" x="367" y="80" openglX="367" openglY="574" sourceAnchor="TL" layerAnchor="TL" offsetX="367" offsetY="80" alpha="1" lock="false"/>
+  
+  
+  <object id="" img="Image_Common\btn_sub_s.png" x="503" y="80" openglX="503" openglY="574" sourceAnchor="TL" layerAnchor="TL" offsetX="503" offsetY="80" alpha="1" lock="false"/>
+  <object id="btn_sub_2" img="Image_Common\btn_sub_select_s.png" x="503" y="80" openglX="503" openglY="574" sourceAnchor="TL" layerAnchor="TL" offsetX="503" offsetY="80" alpha="1" lock="false"/>
+  
+  
+  <object id="" img="Image_Common\btn_sub_s.png" x="639" y="80" openglX="639" openglY="574" sourceAnchor="TL" layerAnchor="TL" offsetX="639" offsetY="80" alpha="1" lock="false"/>
+  <object id="btn_sub_3" img="Image_Common\btn_sub_select_s.png" x="639" y="80" openglX="639" openglY="574" sourceAnchor="TL" layerAnchor="TL" offsetX="639" offsetY="80" alpha="1" lock="false"/>
+  
+  
+  <object id="" img="Image_Common\btn_sub_s.png" x="775" y="80" openglX="775" openglY="574" sourceAnchor="TL" layerAnchor="TL" offsetX="775" offsetY="80" alpha="1" lock="false"/>
+  <object id="btn_sub_4" img="Image_Common\btn_sub_select_s.png" x="775" y="80" openglX="775" openglY="574" sourceAnchor="TL" layerAnchor="TL" offsetX="775" offsetY="80" alpha="1" lock="false"/>
+  
+  
+  <object id="" img="Image_Work\work_Tap1_on_text.png" x="231" y="81" openglX="231" openglY="573" sourceAnchor="TL" layerAnchor="TL" offsetX="231" offsetY="81" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_Tap2_on_text.png" x="367" y="80" openglX="367" openglY="574" sourceAnchor="TL" layerAnchor="TL" offsetX="367" offsetY="80" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_Tap3_on_text.png" x="502" y="80" openglX="502" openglY="574" sourceAnchor="TL" layerAnchor="TL" offsetX="502" offsetY="80" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_Tap4_on_text.png" x="639" y="80" openglX="639" openglY="574" sourceAnchor="TL" layerAnchor="TL" offsetX="639" offsetY="80" alpha="1" lock="false"/>
+  <object id="" img="Image_Work\work_Tap5_on_text.png" x="775" y="80" openglX="775" openglY="574" sourceAnchor="TL" layerAnchor="TL" offsetX="775" offsetY="80" alpha="1" lock="false"/>
+  
+  <object id="" img="Image_UI_Recipe\recipe_Title.png" x="18" y="2" openglX="18" openglY="644" sourceAnchor="TL" layerAnchor="TL" offsetX="18" offsetY="2" alpha="1" lock="false"/>
+  <object id="" img="Image_Common\Q_marks.png" x="241" y="15" openglX="241" openglY="662" sourceAnchor="TL" layerAnchor="TL" offsetX="241" offsetY="15" alpha="1" lock="false"/>
+  <object id="btn_addCash" img="Image_Common\plus_img.png" x="861" y="17" openglX="861" openglY="664" sourceAnchor="TL" layerAnchor="TL" offsetX="861" offsetY="17" alpha="1" lock="false"/>
+  <object id="btn_addGold" img="Image_Common\plus_img.png" x="1135" y="16" openglX="1135" openglY="665" sourceAnchor="TL" layerAnchor="TL" offsetX="1135" offsetY="16" alpha="1" lock="false"/>
+  <object id="" img="Image_Common\icon_gold_m.png" x="931" y="19" openglX="931" openglY="666" sourceAnchor="TL" layerAnchor="TL" offsetX="931" offsetY="19" alpha="1" lock="false"/>
+  <object id="" img="Image_Common\icon_cash_m.png" x="656" y="17" openglX="656" openglY="662" sourceAnchor="TL" layerAnchor="TL" offsetX="656" offsetY="17" alpha="1" lock="false"/>
+  <object id="sp_dp" img="Image_Work\work_panel01.png" x="0" y="0" openglX="231" openglY="32" sourceAnchor="TL" layerAnchor="TL" offsetX="0" offsetY="0" alpha="1" lock="false"/>
+</scene>
