@@ -7,7 +7,7 @@
 //
 
 #include "XmlViewerScene.hpp"
-#include "ui/UIButton.h"
+
 
 using namespace cocos2d;
 using namespace std;
@@ -52,6 +52,8 @@ XmlViewerScene::XmlViewerScene(const char* xmlFile)
 ,_labelMouseLocalAnchor(nullptr)
 ,_currentTarget(nullptr)
 ,_localLine(nullptr)
+,_optionWindow(nullptr)
+,_keySettingWindow(nullptr)
 {
     loadXml(xmlFile);
 }
@@ -103,18 +105,16 @@ void XmlViewerScene::onEnter()
     addChild(_optionWindow, INT_MAX);
     
     
-    ui::Scale9Sprite* nineSprite = ui::Scale9Sprite::create("btn.png");
-    _editBox = ui::EditBox::create(nineSprite->getContentSize(), nineSprite);
-    _editBox->setPlaceholderFontSize(20);
-    _editBox->setFontSize(100);
-    _editBox->setFontColor(Color3B::BLACK);
-    _editBox->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
-    _editBox->setPosition(Vec2(640, 360));
-    _editBox->setDelegate(this);
-    _editBox->setVisible(false);
-    addChild(_editBox, INT_MAX);
+    _keySettingWindow = KeySettingWindow::create();
+    _keySettingWindow->setCallbackKey(std::bind(&XmlViewerScene::callbackKey,
+                                                this,
+                                                placeholders::_1,
+                                                placeholders::_2,
+                                                placeholders::_3));
+    _keySettingWindow->setVisible(false);
+    addChild(_keySettingWindow, INT_MAX);
     
-
+    
     auto mouseListener = EventListenerMouse::create();
     mouseListener->onMouseDown = CC_CALLBACK_1(XmlViewerScene::onMouseDown, this);
     mouseListener->onMouseMove = CC_CALLBACK_1(XmlViewerScene::onMouseMove, this);
@@ -124,11 +124,14 @@ void XmlViewerScene::onEnter()
 
 void XmlViewerScene::onMouseDown(cocos2d::EventMouse* event)
 {
-//    if(_optionWindow->isVisible())
-//    {
-//        _optionWindow->setVisible(false);
-//        return;
-//    }
+    if(_keySettingWindow->isVisible()) // 마우스는 swallow설정이 안되서 터치이벤트 내에서 검사..  누가 고쳐주겠지
+    {
+        return;
+    }
+    if(_optionWindow->isVisible())
+    {
+        return;
+    }
     
     Vec2 cursorPos = Vec2(event->getCursorX() - _uiRootPosition.x,
                           event->getCursorY() - _uiRootPosition.y);
@@ -294,27 +297,28 @@ void XmlViewerScene::settingXml()
     {
         return;
     }
+    
+    _keySettingWindow->setVisible(true);
+}
 
+void XmlViewerScene::callbackKey(std::string key, bool isButton, bool isMember)
+{
+    if(_currentTarget == nullptr)
+    {
+        return;
+    }
+    if(key == "")
+    {
+        return;
+    }
+    
     string xmlPath = UserDefault::getInstance()->getStringForKey("CUR_XML_PATH");
     string imgPath = _currentTarget->getName();
-    
     CCLOG("xmlPath:%s\nimgPath:%s", xmlPath.c_str(), imgPath.c_str());
+    CCLOG("key:%s  isButton:%d   isMember:%d", key.c_str(), isButton, isMember);
     
-    _editBox->setVisible(true);
-}
-
-
-void XmlViewerScene::editBoxTextChanged(cocos2d::ui::EditBox* editBox, const std::string& text)
-{
     
 }
-
-void XmlViewerScene::editBoxReturn(cocos2d::ui::EditBox* editBox)
-{
-    _editBox->setVisible(false);
-}
-
-
 
 
 #pragma mark - 옵션선택창
@@ -378,23 +382,87 @@ bool CustomOptionWindow::onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *unu
 
 
 #pragma mark - 키값 설정창
+bool KeySettingWindow::init()
+{
+    if ( !Layer::init() )
+    {
+        return false;
+    }
+
+    createUI();
+    
+    return true;
+}
+
 void KeySettingWindow::createUI()
 {
+    LayerColor* bg = LayerColor::create(Color4B(0,0,0,125), 1280, 720);;
+    addChild(bg);
+    
+    
+    Label* label = Label::createWithTTF("키값 입력", "fonts/SeoulNamsanEB_0.ttf", 30);
+    label->setPosition(Vec2(640, 440));
+    addChild(label);
+    
+    ui::Scale9Sprite* nineSprite = ui::Scale9Sprite::create("btn.png");
+    ui::EditBox* editBox = ui::EditBox::create(nineSprite->getContentSize(), nineSprite);
+    editBox->setPlaceholderFontSize(20);
+    editBox->setFontSize(100);
+    editBox->setFontColor(Color3B::BLACK);
+    editBox->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    editBox->setPosition(Vec2(640, 360));
+    addChild(editBox);
+    
+    
+    Label* checkLabelType = Label::createWithTTF("버튼 : 체크O \n스프라이트 : 체크X", "fonts/SeoulNamsanEB_0.ttf", 25);
+    checkLabelType->setTextColor(Color4B::WHITE);
+    checkLabelType->setPosition(Vec2(500, 250));
+    addChild(checkLabelType);
+    
+    _checkType = ui::CheckBox::create("res/checkbox.png", "res/check.png");
+    _checkType->setPosition(Vec2(500, 200));
+    addChild(_checkType);
+    
+    
+    Label* checkLabelMember = Label::createWithTTF("멤버변수 : 체크O \n지역변수 : 체크X", "fonts/SeoulNamsanEB_0.ttf", 25);
+    checkLabelMember->setTextColor(Color4B::WHITE);
+    checkLabelMember->setPosition(Vec2(780, 250));
+    addChild(checkLabelMember);
+    
+    _checkMember = ui::CheckBox::create("res/checkbox.png", "res/check.png");
+    _checkMember->setPosition(Vec2(780, 200));
+    addChild(_checkMember);
+    
+    
+    ui::Button* btnGenerate = ui::Button::create("btn.png");
+    btnGenerate->setTitleText("생성");
+    btnGenerate->setTitleColor(Color3B::BLUE);
+    btnGenerate->setTitleFontSize(40);
+    btnGenerate->setTitleFontName("res/SeoulNamsanEB_0.ttf");
+    btnGenerate->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    btnGenerate->setPosition(Vec2(500, 100));
+    btnGenerate->setScale(0.5f);
+    btnGenerate->addClickEventListener([=](Ref* s){
+        this->setVisible(false);
+        _callbackKey(editBox->getText(), _checkType->getSelectedState(), _checkMember->getSelectedState());
+        editBox->setText("");
+    });
+    addChild(btnGenerate);
+    
+    
+    
     ui::Button* btnClose = ui::Button::create("btn.png");
     btnClose->setTitleText("닫기");
     btnClose->setTitleColor(Color3B::BLACK);
     btnClose->setTitleFontSize(40);
     btnClose->setTitleFontName("res/SeoulNamsanEB_0.ttf");
-    btnClose->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
-    btnClose->setPosition(Vec2(1200, 700));
+    btnClose->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    btnClose->setPosition(Vec2(780, 100));
+    btnClose->setScale(0.5f);
     btnClose->addClickEventListener([=](Ref* s){
-        removeFromParent();
+        this->setVisible(false);
+        editBox->setText("");
     });
     addChild(btnClose);
-}
-
-bool KeySettingWindow::onTouchBegan(cocos2d::Touch* t, cocos2d::Event* e)
-{
-    return true;
 }
 

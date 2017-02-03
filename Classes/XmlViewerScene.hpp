@@ -6,10 +6,12 @@
 #include "cocos2d.h"
 #include "cocos-ext.h"
 #include "pugixml.hpp"
+#include "ui/UIButton.h"
+#include "ui/UICheckBox.h"
 
 class CustomOptionWindow;
 class KeySettingWindow;
-class XmlViewerScene : public cocos2d::Layer, cocos2d::ui::EditBoxDelegate
+class XmlViewerScene : public cocos2d::Layer
 {
 public:
     static cocos2d::Scene* createScene(const char* xmlFile);
@@ -31,9 +33,7 @@ private:
     
     void loadXml(const char* xmlFile);
     void settingXml();
-    
-    virtual void editBoxTextChanged(cocos2d::ui::EditBox* editBox, const std::string& text);
-    virtual void editBoxReturn(cocos2d::ui::EditBox* editBox);
+    void callbackKey(std::string key, bool isButton, bool isMember);
     
     // world position
     cocos2d::Label* _labelMouseWorldPosition;
@@ -54,7 +54,7 @@ private:
     
     CustomOptionWindow* _optionWindow;
     
-    cocos2d::ui::EditBox* _editBox;
+    KeySettingWindow* _keySettingWindow;
     
     
 };
@@ -80,11 +80,14 @@ class KeySettingWindow : public cocos2d::Layer
 public:
     virtual bool init();
     
+    CC_SYNTHESIZE(std::function<void(std::string, bool, bool)>, _callbackKey, CallbackKey);
     CREATE_FUNC(KeySettingWindow);
 private:
     
     void createUI();
-    bool onTouchBegan(cocos2d::Touch* t, cocos2d::Event* e);
+    
+    cocos2d::ui::CheckBox* _checkType;
+    cocos2d::ui::CheckBox* _checkMember;
 };
 
 #endif /* XmlViewerScene_hpp */
