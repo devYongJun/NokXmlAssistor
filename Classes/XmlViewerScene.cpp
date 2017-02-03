@@ -7,7 +7,8 @@
 //
 
 #include "XmlViewerScene.hpp"
-
+#include <fstream>
+#include <regex>
 
 using namespace cocos2d;
 using namespace std;
@@ -317,6 +318,51 @@ void XmlViewerScene::callbackKey(std::string key, bool isButton, bool isMember)
     CCLOG("xmlPath:%s\nimgPath:%s", xmlPath.c_str(), imgPath.c_str());
     CCLOG("key:%s  isButton:%d   isMember:%d", key.c_str(), isButton, isMember);
     
+    vector<string> vXMLTextLines;
+    
+    ifstream inputStream;
+    string thisLine;
+    inputStream.open(FileUtils::getInstance()->fullPathForFilename(xmlPath.c_str()));
+    
+    if(!inputStream.is_open())
+    {
+        return;
+    }
+    while( getline(inputStream, thisLine))
+    {
+        vXMLTextLines.push_back(thisLine);
+    }
+    
+    string strCompare;
+    while(imgPath.find("/") != string::npos)
+    {
+        strCompare = imgPath.replace(imgPath.find("/"),1,"\\");
+    }
+    
+    for(int i = 0; i < vXMLTextLines.size(); i++)
+    {
+        if(vXMLTextLines.at(i).find(imgPath) != std::string::npos)
+        {
+            string found = vXMLTextLines.at(i);
+            string keyString = StringUtils::format("<object id=\"%s\"", key.c_str());
+            std::regex rx("<object id=\"\\w*\"");
+            string result = std::regex_replace(found, rx, keyString);
+            
+            CCLOG("found:%s", found.c_str());
+            CCLOG("result:%s", result.c_str());
+            vXMLTextLines.at(i) = result;
+            break;
+        }
+    }
+    inputStream.close();
+    
+    ofstream outputStream(xmlPath);
+    for(int i = 0; i < vXMLTextLines.size(); i++)
+    {
+        outputStream << vXMLTextLines.at(i);
+        outputStream << "\n";
+    }
+    outputStream.close();
     
 }
 
