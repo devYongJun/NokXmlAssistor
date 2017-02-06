@@ -14,7 +14,7 @@
 
 +(IOSFileReader*) getInstance;
 -(NSMutableArray*) getFileList:(std::string) xmlPath;
-
+-(void) runCodeGenerateShell:(NSString*)xmlFile className:(NSString*)className;
 @end
 
 static IOSFileReader* _iosFileReaderInstance = nullptr;
@@ -51,6 +51,14 @@ static IOSFileReader* _iosFileReaderInstance = nullptr;
     return xmlFiles;
 }
 
+-(void) runCodeGenerateShell:(NSString*)xmlFile className:(NSString*)className
+{
+    NSLog(@"%@",xmlFile);
+    NSLog(@"%@",className);
+    
+    
+    NSLog(@"task end");
+}
 
 @end
 
@@ -82,7 +90,11 @@ std::vector<std::string> YJFileReader::getXmlFileList()
     return retList;
 }
 
-
+void YJFileReader::runCodeGenerateShell(std::string xmlFile, std::string className)
+{
+    [[IOSFileReader getInstance] runCodeGenerateShell:[NSString stringWithCString:xmlFile.c_str() encoding:NSUTF8StringEncoding]
+                                            className:[NSString stringWithCString:className.c_str() encoding:NSUTF8StringEncoding]];
+}
 
 
 

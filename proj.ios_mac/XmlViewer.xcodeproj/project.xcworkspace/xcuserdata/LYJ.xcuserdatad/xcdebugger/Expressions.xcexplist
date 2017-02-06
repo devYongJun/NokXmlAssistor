@@ -3,9 +3,6 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "XmlViewerScene::onMouseMove(cocos2d::EventMouse*):XmlViewerScene.cpp">
-      </ContextState>
-      <ContextState
          contextName = "SelectXmlScene::editBoxTextChanged(cocos2d::ui::EditBox*, std::__1::basic_string&lt;char, std::__1::char_traits&lt;char&gt;, std::__1::allocator&lt;char&gt; &gt; const&amp;):SelectXmlScene.cpp">
          <PersistentStrings>
             <PersistentString
@@ -17,10 +14,21 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "XmlViewerScene::onMouseMove(cocos2d::EventMouse*):XmlViewerScene.cpp">
+      </ContextState>
+      <ContextState
          contextName = "SelectXmlScene::onEnter()::$_0::operator()(cocos2d::Ref*) const:SelectXmlScene.cpp">
          <PersistentStrings>
             <PersistentString
                value = "containerPos">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "XmlViewerScene::onEnter():XmlViewerScene.cpp">
+         <PersistentStrings>
+            <PersistentString
+               value = "_callbackSetting">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

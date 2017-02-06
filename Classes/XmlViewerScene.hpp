@@ -33,7 +33,10 @@ private:
     
     void loadXml(const char* xmlFile);
     void settingXml();
+    void settingCode();
     void callbackKey(std::string key, bool isButton, bool isMember);
+    
+    cocos2d::Size _screenSize;
     
     // world position
     cocos2d::Label* _labelMouseWorldPosition;
@@ -65,11 +68,14 @@ class CustomOptionWindow : public cocos2d::Layer
 public:
     virtual bool init();
     
+    CC_SYNTHESIZE(std::function<void(void)>, _callbackSetting, CallbackSetting);
+    CC_SYNTHESIZE(std::function<void(void)>, _callbackGenerateCode, CallbackGenerateCode);
     CC_SYNTHESIZE(std::function<void(void)>, _callbackClose, CallbackClose);
-    CC_SYNTHESIZE(std::function<void(void)>, _callbackSetting, CallbackSetiing);
+    
     CREATE_FUNC(CustomOptionWindow);
 private:
     
+    void onEnter();
     void createUI();
     bool onTouchBegan(cocos2d::Touch* t, cocos2d::Event* e);
 };
@@ -84,6 +90,7 @@ public:
     CREATE_FUNC(KeySettingWindow);
 private:
     
+    void onEnter();
     void createUI();
     
     cocos2d::ui::CheckBox* _checkType;

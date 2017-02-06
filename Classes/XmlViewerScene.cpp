@@ -7,6 +7,8 @@
 //
 
 #include "XmlViewerScene.hpp"
+
+#include "FileReader.h"
 #include <fstream>
 #include <regex>
 
@@ -56,6 +58,8 @@ XmlViewerScene::XmlViewerScene(const char* xmlFile)
 ,_optionWindow(nullptr)
 ,_keySettingWindow(nullptr)
 {
+    _screenSize = Director::getInstance()->getWinSize();
+    
     loadXml(xmlFile);
 }
 
@@ -96,12 +100,19 @@ void XmlViewerScene::onEnter()
     addChild(_localLine, INT_MAX-1);
     
     _optionWindow = CustomOptionWindow::create();
+    _optionWindow->setCallbackSetting([=]() {
+        settingXml();
+    });
+    _optionWindow->setCallbackGenerateCode([=]() {
+        settingCode();
+    });
     _optionWindow->setCallbackClose([=]() {
         Director::getInstance()->popScene();
     });
-    _optionWindow->setCallbackSetiing([=]() {
-        settingXml();
-    });
+    
+    auto var = _optionWindow->getCallbackSetting();
+    auto tvar = _optionWindow->getCallbackClose();
+    
     _optionWindow->setVisible(false);
     addChild(_optionWindow, INT_MAX);
     
@@ -181,12 +192,20 @@ void XmlViewerScene::showPosition(Sprite* sprite, Vec2 cursorPos)
 {
     
     // world position text
-    _labelMouseWorldPosition->setString(StringUtils::format("world Position\n(%.0f,%.0f)", cursorPos.x, cursorPos.y));
+    _labelMouseWorldPosition->setString(StringUtils::format("world Position\n(%.0f,%.0f)\n(%.3f,%.3f)",
+                                                            cursorPos.x,
+                                                            cursorPos.y,
+                                                            cursorPos.x / _screenSize.width,
+                                                            cursorPos.y / _screenSize.height));
     
     // local position text
     float localX = cursorPos.x - sprite->getPositionX();
     float localY = cursorPos.y - sprite->getPositionY();
-    _labelMouseLocalPosition->setString(StringUtils::format("local Position\n(%.0f,%.0f)", localX, localY));
+    _labelMouseLocalPosition->setString(StringUtils::format("local Position\n(%.0f,%.0f)\n(%.3f, %.3f)",
+                                                            localX,
+                                                            localY,
+                                                            localX / sprite->getContentSize().width,
+                                                            localY / sprite->getContentSize().height));
     
     // local position draw
     _localLine->clear();
@@ -302,6 +321,13 @@ void XmlViewerScene::settingXml()
     _keySettingWindow->setVisible(true);
 }
 
+void XmlViewerScene::settingCode()
+{
+    string xmlFile = UserDefault::getInstance()->getStringForKey("CUR_XML_PATH");
+    string className = "TEST";
+    YJFileReader::create()->runCodeGenerateShell(xmlFile, className);
+}
+
 void XmlViewerScene::callbackKey(std::string key, bool isButton, bool isMember)
 {
     if(_currentTarget == nullptr)
@@ -375,8 +401,6 @@ bool CustomOptionWindow::init()
         return false;
     }
     
-    createUI();
-    
     auto touchListener = EventListenerTouchOneByOne::create();
     touchListener->setSwallowTouches(true);
     touchListener->onTouchBegan = CC_CALLBACK_2(CustomOptionWindow::onTouchBegan, this);
@@ -385,34 +409,42 @@ bool CustomOptionWindow::init()
     return true;
 }
 
+void CustomOptionWindow::onEnter()
+{
+    Layer::onEnter();
+    
+    createUI();
+}
+
+
 void CustomOptionWindow::createUI()
 {
-    LayerColor* bg = LayerColor::create(Color4B(0,0,0,175), 200, 100);
-    addChild(bg);
+    float w = 200.0f;
+    float h = 180.0f;
+    LayerColor* popBG = LayerColor::create(Color4B(0,0,0,175), w, h);
+    addChild(popBG);
     
-    ui::Button* btnClose = ui::Button::create("btn.png");
-    btnClose->setTitleText("Xml선택화면으로 가기");
-    btnClose->setTitleColor(Color3B::RED);
-    btnClose->setTitleFontSize(40);
-    btnClose->setTitleFontName("res/SeoulNamsanEB_0.ttf");
-    btnClose->setScale(0.4f);
-    btnClose->setPosition(Vec2(100, 28));
-    btnClose->addClickEventListener([=](Ref* s){
-        _callbackClose();
-    });
-    bg->addChild(btnClose);
+    string names[3] = { "키값 설정하기", "코드 생성하기", "선택화면으로 이동" };
+    Color3B colors[3] = { Color3B::GREEN, Color3B::BLUE, Color3B::RED };
+    function<void(void)> funcs[3] = {_callbackSetting, _callbackGenerateCode, _callbackClose };
     
-    ui::Button* btnSetting = ui::Button::create("btn.png");
-    btnSetting->setTitleText("Xml 키값설정 하기");
-    btnSetting->setTitleColor(Color3B::BLACK);
-    btnSetting->setTitleFontSize(40);
-    btnSetting->setTitleFontName("res/SeoulNamsanEB_0.ttf");
-    btnSetting->setScale(0.4f);
-    btnSetting->setPosition(Vec2(100, 71));
-    btnSetting->addClickEventListener([=](Ref* s){
-        _callbackSetting();
-    });
-    bg->addChild(btnSetting);
+    for(int i = 0; i < 3; i++)
+    {
+        int index = i;
+        ui::Button* btnItem = ui::Button::create("btn.png");
+        btnItem->setTitleText(names[index]);
+        btnItem->setTitleColor(colors[index]);
+        btnItem->setTitleFontSize(40);
+        btnItem->setTitleFontName("fonts/SeoulNamsanEB_0.ttf");
+        btnItem->setScale(0.4f);
+        btnItem->setPosition(Vec2(w/2, h - ((h / 4) * (index+1))));
+        btnItem->addClickEventListener([=](Ref* s){
+            CCLOG("func:%d", index);
+            funcs[index]();
+        });
+        popBG->addChild(btnItem);
+    }
+
 }
 
 
@@ -427,6 +459,12 @@ bool CustomOptionWindow::onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *unu
 }
 
 
+
+
+
+
+
+
 #pragma mark - 키값 설정창
 bool KeySettingWindow::init()
 {
@@ -435,9 +473,14 @@ bool KeySettingWindow::init()
         return false;
     }
 
-    createUI();
-    
     return true;
+}
+
+void KeySettingWindow::onEnter()
+{
+    Layer::onEnter();
+    
+    createUI();
 }
 
 void KeySettingWindow::createUI()
@@ -484,7 +527,7 @@ void KeySettingWindow::createUI()
     btnGenerate->setTitleText("생성");
     btnGenerate->setTitleColor(Color3B::BLUE);
     btnGenerate->setTitleFontSize(40);
-    btnGenerate->setTitleFontName("res/SeoulNamsanEB_0.ttf");
+    btnGenerate->setTitleFontName("fonts/SeoulNamsanEB_0.ttf");
     btnGenerate->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     btnGenerate->setPosition(Vec2(500, 100));
     btnGenerate->setScale(0.5f);
@@ -501,7 +544,7 @@ void KeySettingWindow::createUI()
     btnClose->setTitleText("닫기");
     btnClose->setTitleColor(Color3B::BLACK);
     btnClose->setTitleFontSize(40);
-    btnClose->setTitleFontName("res/SeoulNamsanEB_0.ttf");
+    btnClose->setTitleFontName("fonts/SeoulNamsanEB_0.ttf");
     btnClose->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     btnClose->setPosition(Vec2(780, 100));
     btnClose->setScale(0.5f);
