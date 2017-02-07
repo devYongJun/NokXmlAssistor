@@ -71,7 +71,7 @@ static IOSFileReader* _iosFileReaderInstance = nullptr;
     NSPipe *inPipe = [[NSPipe alloc] init]; // pipe for shell input
     
     [task setStandardInput:inPipe];
-    [task setLaunchPath:@"/bin/sh"];
+    [task setLaunchPath:[[NSBundle mainBundle] pathForResource:@"res/CodeGenerator/sh" ofType:@""]];
     NSArray* args = [NSArray arrayWithObjects:shFile, className, xmlFile, savePath, nil];
     [task setArguments:args];
     

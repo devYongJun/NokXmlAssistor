@@ -19,7 +19,7 @@ inputfolder=$3
 
 if [[ $inputpath =~ [a-zA-Z0-9_]*\/[a-zA-Z0-9_]*\/[a-zA-Z0-9_]*\.xml ]]
 then
-xmlpath="${BASH_REMATCH[0]}"
+    xmlpath="${BASH_REMATCH[0]}"
 fi
 
 echo "xmlpath : $xmlpath"
@@ -90,61 +90,73 @@ isFirst=true
 # xml 파일을 한줄씩 읽는다
 while read line
 do
-linestr=$line
-cutstr=${linestr/'<object id="'/}
-resultstr="${cutstr%%'"'*}"
+    linestr=$line
+    cutstr=${linestr/'<object id="'/}
+    resultstr="${cutstr%%'"'*}"
 
-# key값이 없으면 제외
-if [ -z "$resultstr" ];
-then
-continue
-fi
-# <scene></scene>구문 제외
-exceptstr=${resultstr:0:1}
-if [ "$exceptstr" = "<" ];
-then
-continue
-fi
+    # key값이 없으면 제외
+    if [ -z "$resultstr" ];
+    then
+    continue
+    fi
 
-# 여기까지왔으면 key값이 존재함
-# key값 추출해서 함수생성 (btn 으로 시작하는 키는 버튼클래스 생성)
+    # <scene></scene>구문 제외
+    exceptstr=${resultstr:0:1}
+    if [ "$exceptstr" = "<" ];
+    then
+    continue
+    fi
 
-if [[ $resultstr =~ ^btn[a-zA-Z0-9_]* ]]
-then
-oriname=${BASH_REMATCH[0]}
-convertname=${oriname/b/B}
-if [ $isFirst == true ]
-then
-echo ":_"$oriname"(nullptr)" >> buttonNull.txt
-isFirst=false
-else
-echo ",_"$oriname"(nullptr)" >> buttonNull.txt
-fi
-echo "\tcocos2d::ui::Button* _"$oriname";" >> buttonH.txt
-echo "\tvoid on"$convertname"(Ref* sender);" >> functionH.txt
-echo "void "$inputclass"::on"$convertname"(cocos2d::Ref* sender)\n{\n\n}\n\n" >> functionCPP.txt
-echo "\t\tcase(hashStr("\"$resultstr\"")):
-\t\t{\n\t\t\t_"$oriname" = uiutil::ButtonWithResource(ui->toSpriteResource());
-\t\t\tif(_"$oriname" != nullptr)
-\t\t\t{\n\t\t\t\taddChild(_"$oriname");
-\t\t\t\t_"$oriname"->addClickEventListener(CC_CALLBACK_1("$inputclass"::on"$convertname", this));
-\t\t\t}\t\t\n\t\tbreak;" >> buttonCase.txt
-else
-if [ $isFirst == true ]
-then
-echo ":_"$resultstr"(nullptr)" >> spriteNull.txt
-isFirst=false
-else
-echo ",_"$resultstr"(nullptr)" >> spriteNull.txt
-fi
-echo "\tcocos2d::Sprite* _"$resultstr";" >> spriteH.txt
-echo "\t\tcase(hashStr("\"$resultstr\"")):
-\t\t{\n\t\t\t_"$resultstr" = uiutil::SpriteWithResource(ui->toSpriteResources());
-\t\t\tif(_"$resultstr" != nullptr)
-\t\t\t{\n\t\t\t\taddChild(_"$resultstr");
-\t\t\t}\n\t\t}\n\t\tbreak;" >> spriteCase.txt
-fi
+    # 여기까지왔으면 key값이 존재함
 
+    # 무효 키값
+    if [ "$resultStr" = "-" ]
+    then
+    continue
+    fi
+
+    if [ "$resultStr" = "_" ]
+    then
+    continue
+    fi
+
+
+    # key값 추출해서 함수생성 (btn 으로 시작하는 키는 버튼클래스 생성)
+    if [[ $resultstr =~ ^btn[a-zA-Z0-9_]* ]]
+        then
+            oriname=${BASH_REMATCH[0]}
+            convertname=${oriname/b/B}
+        if [ $isFirst == true ]
+        then
+            echo ":_"$oriname"(nullptr)" >> buttonNull.txt
+            isFirst=false
+        else
+            echo ",_"$oriname"(nullptr)" >> buttonNull.txt
+        fi
+            echo "\tcocos2d::ui::Button* _"$oriname";" >> buttonH.txt
+            echo "\tvoid on"$convertname"(Ref* sender);" >> functionH.txt
+            echo "void "$inputclass"::on"$convertname"(cocos2d::Ref* sender)\n{\n\n}\n\n" >> functionCPP.txt
+            echo "\t\tcase(hashStr("\"$resultstr\"")):
+        {\n\t\t\t_"$oriname" = uiutil::ButtonWithResource(ui->toSpriteResource());
+            if(_"$oriname" != nullptr)
+            {\n\t\t\t\taddChild(_"$oriname");
+            \t_"$oriname"->addClickEventListener(CC_CALLBACK_1("$inputclass"::on"$convertname", this));
+            }\t\t\n\t\tbreak;" >> buttonCase.txt
+        else
+            if [ $isFirst == true ]
+            then
+                echo ":_"$resultstr"(nullptr)" >> spriteNull.txt
+                isFirst=false
+            else
+                echo ",_"$resultstr"(nullptr)" >> spriteNull.txt
+            fi
+        echo "\tcocos2d::Sprite* _"$resultstr";" >> spriteH.txt
+        echo "\t\tcase(hashStr("\"$resultstr\"")):
+        {\n\t\t\t_"$resultstr" = uiutil::SpriteWithResource(ui->toSpriteResources());
+        \tif(_"$resultstr" != nullptr)
+        \t{\n\t\t\t\taddChild(_"$resultstr");
+        \t}\n\t\t}\n\t\tbreak;" >> spriteCase.txt
+    fi
 done < $inputpath
 
 echo "모든파일 통합"
