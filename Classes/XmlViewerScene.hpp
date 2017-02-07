@@ -11,6 +11,7 @@
 
 class CustomOptionWindow;
 class KeySettingWindow;
+class CodeConfigWindow;
 class XmlViewerScene : public cocos2d::Layer
 {
 public:
@@ -27,6 +28,7 @@ private:
     void onMouseDown(cocos2d::EventMouse* event);
     void onMouseMove(cocos2d::EventMouse* event);
     
+    bool usingPopup();
     cocos2d::Sprite* detectImage(cocos2d::Vec2 cursorPos);
     void showPosition(cocos2d::Sprite* sprite, cocos2d::Vec2 cursorPos);
     void showTarget(cocos2d::Sprite* sprite);
@@ -34,7 +36,8 @@ private:
     void loadXml(const char* xmlFile);
     void settingXml();
     void settingCode();
-    void callbackKey(std::string key, bool isButton, bool isMember);
+    void callbackKey(std::string key, bool isButton);
+    void callbackCodeConfig(std::string className);
     
     cocos2d::Size _screenSize;
     
@@ -56,8 +59,8 @@ private:
     cocos2d::Vec2 _uiRootPosition;
     
     CustomOptionWindow* _optionWindow;
-    
     KeySettingWindow* _keySettingWindow;
+    CodeConfigWindow* _codeConfigWindow;
     
     
 };
@@ -86,7 +89,7 @@ class KeySettingWindow : public cocos2d::Layer
 public:
     virtual bool init();
     
-    CC_SYNTHESIZE(std::function<void(std::string, bool, bool)>, _callbackKey, CallbackKey);
+    CC_SYNTHESIZE(std::function<void(std::string, bool)>, _callbackKey, CallbackKey);
     CREATE_FUNC(KeySettingWindow);
 private:
     
@@ -95,6 +98,18 @@ private:
     
     cocos2d::ui::CheckBox* _checkType;
     cocos2d::ui::CheckBox* _checkMember;
+};
+
+class CodeConfigWindow : public cocos2d::Layer
+{
+public:
+    virtual bool init();
+    
+    CC_SYNTHESIZE(std::function<void(std::string)>, _callbackConfig, CallbackConfig);
+    CREATE_FUNC(CodeConfigWindow);
+private:
+    void onEnter();
+    void createUI();
 };
 
 #endif /* XmlViewerScene_hpp */

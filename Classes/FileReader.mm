@@ -11,7 +11,9 @@
 
 
 @interface IOSFileReader : NSObject
-
+{
+    NSString* _outPutTxt;
+}
 +(IOSFileReader*) getInstance;
 -(NSMutableArray*) getFileList:(std::string) xmlPath;
 -(void) runCodeGenerateShell:(NSString*)xmlFile className:(NSString*)className;
@@ -53,11 +55,33 @@ static IOSFileReader* _iosFileReaderInstance = nullptr;
 
 -(void) runCodeGenerateShell:(NSString*)xmlFile className:(NSString*)className
 {
-    NSLog(@"%@",xmlFile);
-    NSLog(@"%@",className);
+    
+    NSString* bundlePath = [[NSBundle mainBundle] bundlePath];
+    NSString* savePath = [bundlePath stringByReplacingOccurrencesOfString:@"/XmlViewer-desktop.app" withString:@""];
+    NSString* shFile = [[NSBundle mainBundle] pathForResource:@"res/CodeGenerator/createClass" ofType:@"sh"];
+    //NSString* shFile = [NSString stringWithFormat:@"%@/createClass.sh", savePath];
+    NSLog(@"shFile : %@", shFile);
+    NSLog(@"xmlFile : %@",xmlFile);
+    NSLog(@"className : %@",className);
+    NSLog(@"bundlePath : %@", bundlePath);
+    NSLog(@"savePath : %@", savePath);
     
     
-    NSLog(@"task end");
+    NSTask* task = [[NSTask alloc] init];
+    NSPipe *inPipe = [[NSPipe alloc] init]; // pipe for shell input
+    
+    [task setStandardInput:inPipe];
+    [task setLaunchPath:shFile];
+    
+    NSArray* args = [NSArray arrayWithObjects:className, xmlFile, savePath, nil];
+    [task setArguments:args];
+    
+    
+    NSPipe* outPipe = [[NSPipe alloc] init];
+    [task setStandardOutput:outPipe];
+
+    [task launch];
+
 }
 
 @end

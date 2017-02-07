@@ -1,15 +1,21 @@
 #!/bin/bash
 # 클래스이름 입력받는다
-echo -n "class name : "
-read inputname
-echo $inputname
-#inputname=TESTCLASS
+#echo -n "class name : "
+#read inputclass
+#echo $inputclass
+inputclass=$1
 
 # 적용할 xml파일 등록
-echo -n "wirte or drag xml filepath : "
-read inputpath
-echo $inputpath
+#echo -n "wirte or drag xml filepath : "
+#read inputpath
+#echo $inputpath
+inputpath=$2
 
+# 코드 생성할 위치
+#echo -n "write or drag code filefolder : "
+#read inputfolder
+#echo $inputfolder
+inputfolder=$3
 
 if [[ $inputpath =~ [a-zA-Z0-9_]*\/[a-zA-Z0-9_]*\/[a-zA-Z0-9_]*\.xml ]]
 then
@@ -17,6 +23,7 @@ xmlpath="${BASH_REMATCH[0]}"
 fi
 
 echo "xmlpath : $xmlpath"
+inputname="$inputfolder/$inputclass"
 
 # 클래스파일 생성
 > "$inputname.h"
@@ -26,13 +33,13 @@ now="$(date)"
 
 # .h파일 작성
 echo -e "//"$now"\n
-#ifndef "$inputname"_h
-#define "$inputname"_h\n
+#ifndef "$inputclass"_h
+#define "$inputclass"_h\n
 #include \"ui/cocosGUI.h\"
 #include \"UIControl/UIBase.h\"\n
-class "$inputname" : public UIBase\n{
+class "$inputclass" : public UIBase\n{
 public:
-\t$inputname();\n\tvirtual ~$inputname();\n
+\t$inputclass();\n\tvirtual ~$inputclass();\n
 private:\n
 \tvoid onEnter();
 \tvoid onExit();
@@ -44,17 +51,17 @@ private:\n
 
 
 # .cpp파일 작성
-echo -e "#include \""$inputname.h"\"\n
+echo -e "#include \""$inputclass.h"\"\n
 using namespace cocos2d;
 using namespace std;\n
-$inputname::$inputname()\n{\n\t//initnull\n}\n
-$inputname::~$inputname()\n{\n\n}\n
-void $inputname::onEnter()
+$inputclass::$inputclass()\n{\n\t//initnull\n}\n
+$inputclass::~$inputclass()\n{\n\n}\n
+void $inputclass::onEnter()
 {\n\tUIBase::onEnter();
 \tload("\"$xmlpath\"")\n}\n
-void $inputname::onExit()
+void $inputclass::onExit()
 {\n\tUIBase::onExit();\n}\n
-void $inputname::createControl(UIResource* ui)
+void $inputclass::createControl(UIResource* ui)
 {\n\tswitch(hashStr(ui->id.c_str()))
 \t{\n\t\t//sprite case\n\t\t//button case
 \t\tdefault:
@@ -87,7 +94,7 @@ cutstr=${linestr/'<object id="'/}
 resultstr="${cutstr%%'"'*}"
 
 # key값이 없으면 제외
-if [ -z $resultstr ];
+if [ -z "$resultstr" ];
 then
 continue
 fi
@@ -107,12 +114,12 @@ convertname=${oriname/b/B}
 echo -e "\t_"$oriname" = nullptr;" >> buttonNull.txt
 echo -e "\tcocos2d::ui::Button* _"$oriname";" >> buttonH.txt
 echo -e "\tvoid on"$convertname"(Ref* sender);" >> functionH.txt
-echo -e "void "$inputname"::on"$convertname"(cocos2d::Ref* sender)\n{\n\n}\n\n" >> functionCPP.txt
+echo -e "void "$inputclass"::on"$convertname"(cocos2d::Ref* sender)\n{\n\n}\n\n" >> functionCPP.txt
 echo -e "\t\tcase("\"$resultstr\""):
 \t\t{\n\t\t\t_"$oriname" = uiutil::ButtonWithResource(ui->toSpriteResource());
 \t\t\tif(_"$oriname" != nullptr)
 \t\t\t{\n\t\t\t\taddChild(_"$oriname");
-\t\t\t\t_"$oriname"->addClickEventListener(CC_CALLBACK_1("$inputname"::on"$convertname", this));
+\t\t\t\t_"$oriname"->addClickEventListener(CC_CALLBACK_1("$inputclass"::on"$convertname", this));
 \t\t\t}\t\t\n\t\tbreak;" >> buttonCase.txt
 else
 echo -e "\t_"$resultstr" = nullptr;" >> spriteNull.txt
@@ -126,6 +133,7 @@ fi
 
 done < $inputpath
 
+echo "모든파일 통합"
 # 모든 파일 통합
 sed -i '' '/버 튼/r buttonH.txt' $inputname.h
 sed -i '' '/스프라이트/r spriteH.txt' $inputname.h

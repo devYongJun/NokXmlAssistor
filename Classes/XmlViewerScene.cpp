@@ -11,6 +11,7 @@
 #include "FileReader.h"
 #include <fstream>
 #include <regex>
+#include <algorithm>
 
 using namespace cocos2d;
 using namespace std;
@@ -99,6 +100,7 @@ void XmlViewerScene::onEnter()
     _localLine->setPosition(_uiRootPosition);
     addChild(_localLine, INT_MAX-1);
     
+    // 설정선택 팝업
     _optionWindow = CustomOptionWindow::create();
     _optionWindow->setCallbackSetting([=]() {
         settingXml();
@@ -110,22 +112,28 @@ void XmlViewerScene::onEnter()
         Director::getInstance()->popScene();
     });
     
-    auto var = _optionWindow->getCallbackSetting();
-    auto tvar = _optionWindow->getCallbackClose();
-    
     _optionWindow->setVisible(false);
     addChild(_optionWindow, INT_MAX);
     
     
+    // 키값설정 팝업
     _keySettingWindow = KeySettingWindow::create();
     _keySettingWindow->setCallbackKey(std::bind(&XmlViewerScene::callbackKey,
                                                 this,
                                                 placeholders::_1,
-                                                placeholders::_2,
-                                                placeholders::_3));
+                                                placeholders::_2));
     _keySettingWindow->setVisible(false);
     addChild(_keySettingWindow, INT_MAX);
     
+    
+    
+    // 코드설정 팝업
+    _codeConfigWindow = CodeConfigWindow::create();
+    _codeConfigWindow->setCallbackConfig(std::bind(&XmlViewerScene::callbackCodeConfig,
+                                                   this,
+                                                   placeholders::_1));
+    _codeConfigWindow->setVisible(false);
+    addChild(_codeConfigWindow, INT_MAX);
     
     auto mouseListener = EventListenerMouse::create();
     mouseListener->onMouseDown = CC_CALLBACK_1(XmlViewerScene::onMouseDown, this);
@@ -134,13 +142,17 @@ void XmlViewerScene::onEnter()
     
 }
 
+ // 마우스는 swallow설정이 안되서 터치이벤트 내에서 검사..  누가 고쳐주겠지
+bool XmlViewerScene::usingPopup()
+{
+    return _keySettingWindow->isVisible() || _optionWindow->isVisible() || _codeConfigWindow->isVisible();
+}
+
+
 void XmlViewerScene::onMouseDown(cocos2d::EventMouse* event)
 {
-    if(_keySettingWindow->isVisible()) // 마우스는 swallow설정이 안되서 터치이벤트 내에서 검사..  누가 고쳐주겠지
-    {
-        return;
-    }
-    if(_optionWindow->isVisible())
+    
+    if(usingPopup())
     {
         return;
     }
@@ -150,18 +162,22 @@ void XmlViewerScene::onMouseDown(cocos2d::EventMouse* event)
     
     auto detect = detectImage(cursorPos);
     
-    if(detect)
+    if(event->getMouseButton() == MOUSE_BUTTON_LEFT)
     {
-        if(event->getMouseButton() == MOUSE_BUTTON_LEFT)
+        if(detect)
         {
             showPosition(detect, cursorPos);
         }
-        else if(event->getMouseButton() == MOUSE_BUTTON_RIGHT)
+        
+    }
+    else if(event->getMouseButton() == MOUSE_BUTTON_RIGHT)
+    {
+        if(detect)
         {
             showTarget(detect);
-            _optionWindow->setPosition(cursorPos);
-            _optionWindow->setVisible(true);
         }
+        _optionWindow->setPosition(cursorPos);
+        _optionWindow->setVisible(true);
     }
 }
 
@@ -323,12 +339,10 @@ void XmlViewerScene::settingXml()
 
 void XmlViewerScene::settingCode()
 {
-    string xmlFile = UserDefault::getInstance()->getStringForKey("CUR_XML_PATH");
-    string className = "TEST";
-    YJFileReader::create()->runCodeGenerateShell(xmlFile, className);
+    _codeConfigWindow->setVisible(true);
 }
 
-void XmlViewerScene::callbackKey(std::string key, bool isButton, bool isMember)
+void XmlViewerScene::callbackKey(std::string key, bool isButton)
 {
     if(_currentTarget == nullptr)
     {
@@ -342,7 +356,16 @@ void XmlViewerScene::callbackKey(std::string key, bool isButton, bool isMember)
     string xmlPath = UserDefault::getInstance()->getStringForKey("CUR_XML_PATH");
     string imgPath = _currentTarget->getName();
     CCLOG("xmlPath:%s\nimgPath:%s", xmlPath.c_str(), imgPath.c_str());
-    CCLOG("key:%s  isButton:%d   isMember:%d", key.c_str(), isButton, isMember);
+    CCLOG("key:%s  isButton:%d", key.c_str(), isButton);
+    
+    string keyValue = key;
+    if(isButton)
+    {
+        std::transform(key.begin(), key.begin()+1, key.begin(), ::toupper);
+        keyValue = "btn";
+        keyValue.append(key);
+    }
+    
     
     vector<string> vXMLTextLines;
     
@@ -370,7 +393,7 @@ void XmlViewerScene::callbackKey(std::string key, bool isButton, bool isMember)
         if(vXMLTextLines.at(i).find(imgPath) != std::string::npos)
         {
             string found = vXMLTextLines.at(i);
-            string keyString = StringUtils::format("<object id=\"%s\"", key.c_str());
+            string keyString = StringUtils::format("<object id=\"%s\"", keyValue.c_str());
             std::regex rx("<object id=\"\\w*\"");
             string result = std::regex_replace(found, rx, keyString);
             
@@ -391,6 +414,15 @@ void XmlViewerScene::callbackKey(std::string key, bool isButton, bool isMember)
     outputStream.close();
     
 }
+
+
+void XmlViewerScene::callbackCodeConfig(std::string className)
+{
+    string xmlFile = UserDefault::getInstance()->getStringForKey("CUR_XML_PATH");
+    
+    YJFileReader::create()->runCodeGenerateShell(xmlFile, className);
+}
+
 
 
 #pragma mark - 옵션선택창
@@ -502,26 +534,29 @@ void KeySettingWindow::createUI()
     editBox->setPosition(Vec2(640, 360));
     addChild(editBox);
     
+    Label* prep = Label::createWithTTF("btn + ", "fonts/SeoulNamsanEB_0.ttf", 100);
+    prep->setPosition(300, 360);
+    prep->setVisible(false);
+    addChild(prep);
     
     Label* checkLabelType = Label::createWithTTF("버튼 : 체크O \n스프라이트 : 체크X", "fonts/SeoulNamsanEB_0.ttf", 25);
     checkLabelType->setTextColor(Color4B::WHITE);
-    checkLabelType->setPosition(Vec2(500, 250));
+    checkLabelType->setPosition(Vec2(1280/2, 250));
     addChild(checkLabelType);
     
     _checkType = ui::CheckBox::create("res/checkbox.png", "res/check.png");
-    _checkType->setPosition(Vec2(500, 200));
+    _checkType->setPosition(Vec2(1280/2, 200));
+    _checkType->addEventListener([=](Ref* s, ui::CheckBox::EventType type){
+        if(type == ui::CheckBox::EventType::SELECTED)
+        {
+            prep->setVisible(true);
+        }
+        else
+        {
+            prep->setVisible(false);
+        }
+    });
     addChild(_checkType);
-    
-    
-    Label* checkLabelMember = Label::createWithTTF("멤버변수 : 체크O \n지역변수 : 체크X", "fonts/SeoulNamsanEB_0.ttf", 25);
-    checkLabelMember->setTextColor(Color4B::WHITE);
-    checkLabelMember->setPosition(Vec2(780, 250));
-    addChild(checkLabelMember);
-    
-    _checkMember = ui::CheckBox::create("res/checkbox.png", "res/check.png");
-    _checkMember->setPosition(Vec2(780, 200));
-    addChild(_checkMember);
-    
     
     ui::Button* btnGenerate = ui::Button::create("btn.png");
     btnGenerate->setTitleText("생성");
@@ -533,7 +568,8 @@ void KeySettingWindow::createUI()
     btnGenerate->setScale(0.5f);
     btnGenerate->addClickEventListener([=](Ref* s){
         this->setVisible(false);
-        _callbackKey(editBox->getText(), _checkType->getSelectedState(), _checkMember->getSelectedState());
+        _callbackKey(editBox->getText(), _checkType->getSelectedState());
+        _checkType->setSelected(false);
         editBox->setText("");
     });
     addChild(btnGenerate);
@@ -550,8 +586,77 @@ void KeySettingWindow::createUI()
     btnClose->setScale(0.5f);
     btnClose->addClickEventListener([=](Ref* s){
         this->setVisible(false);
+        _checkType->setSelected(false);
         editBox->setText("");
     });
     addChild(btnClose);
 }
 
+
+
+
+#pragma mark - 생성코드 설정창
+bool CodeConfigWindow::init()
+{
+    if(!Layer::init())
+    {
+        return false;
+    }
+    return true;
+}
+
+
+void CodeConfigWindow::onEnter()
+{
+    Layer::onEnter();
+    
+    createUI();
+}
+
+void CodeConfigWindow::createUI()
+{
+    LayerColor* bg = LayerColor::create(Color4B(0,0,0,125), 1280, 720);;
+    addChild(bg);
+    
+    Label* labelClassName = Label::createWithTTF("클래스이름 입력", "fonts/SeoulNamsanEB_0.ttf", 30);
+    labelClassName->setPosition(Vec2(1280/2, 440));
+    addChild(labelClassName);
+    
+    ui::EditBox* editBoxClassName = ui::EditBox::create(Size(400, 100), ui::Scale9Sprite::create("res/editbox.png"));
+    editBoxClassName->setPlaceholderFontSize(20);
+    editBoxClassName->setFontSize(60);
+    editBoxClassName->setFontColor(Color3B::BLACK);
+    editBoxClassName->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    editBoxClassName->setPosition(Vec2(1280/2, 360));
+    addChild(editBoxClassName);
+    
+    ui::Button* btnGenerate = ui::Button::create("btn.png");
+    btnGenerate->setTitleText("코드 생성");
+    btnGenerate->setTitleColor(Color3B::BLUE);
+    btnGenerate->setTitleFontSize(40);
+    btnGenerate->setTitleFontName("fonts/SeoulNamsanEB_0.ttf");
+    btnGenerate->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    btnGenerate->setPosition(Vec2(500, 100));
+    btnGenerate->setScale(0.5f);
+    btnGenerate->addClickEventListener([=](Ref* s){
+        this->setVisible(false);
+        _callbackConfig(editBoxClassName->getText());
+    });
+    addChild(btnGenerate);
+    
+    
+    ui::Button* btnClose = ui::Button::create("btn.png");
+    btnClose->setTitleText("닫기");
+    btnClose->setTitleColor(Color3B::BLACK);
+    btnClose->setTitleFontSize(40);
+    btnClose->setTitleFontName("fonts/SeoulNamsanEB_0.ttf");
+    btnClose->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    btnClose->setPosition(Vec2(780, 100));
+    btnClose->setScale(0.5f);
+    btnClose->addClickEventListener([=](Ref* s){
+        this->setVisible(false);
+        editBoxClassName->setText("");
+    });
+    addChild(btnClose);
+    
+}
