@@ -569,7 +569,7 @@ void KeySettingWindow::createUI()
     btnGenerate->addClickEventListener([=](Ref* s){
         this->setVisible(false);
         _callbackKey(editBox->getText(), _checkType->getSelectedState());
-        _checkType->setSelected(false);
+        //_checkType->setSelected(false);
         editBox->setText("");
     });
     addChild(btnGenerate);

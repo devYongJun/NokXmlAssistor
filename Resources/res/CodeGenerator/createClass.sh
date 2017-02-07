@@ -44,7 +44,7 @@ private:\n
 \tvoid onEnter();
 \tvoid onExit();
 \tvoid createControl(UIResource* ui);
-\t// 버튼\n
+\t// 버 튼\n
 \t// 스프라이트\n
 \t// 버튼콜백\n}\n
 #endif" >> $inputname.h
