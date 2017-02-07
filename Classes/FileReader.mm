@@ -59,7 +59,7 @@ static IOSFileReader* _iosFileReaderInstance = nullptr;
     NSString* bundlePath = [[NSBundle mainBundle] bundlePath];
     NSString* savePath = [bundlePath stringByReplacingOccurrencesOfString:@"/XmlViewer-desktop.app" withString:@""];
     NSString* shFile = [[NSBundle mainBundle] pathForResource:@"res/CodeGenerator/createClass" ofType:@"sh"];
-    //NSString* shFile = [NSString stringWithFormat:@"%@/createClass.sh", savePath];
+    //NSString* shFile = [NSString stringWithFormat:@"%@/createClass.sh", savePath]; // 쉘파일을 앱아이콘옆에 둘때
     NSLog(@"shFile : %@", shFile);
     NSLog(@"xmlFile : %@",xmlFile);
     NSLog(@"className : %@",className);
@@ -71,9 +71,8 @@ static IOSFileReader* _iosFileReaderInstance = nullptr;
     NSPipe *inPipe = [[NSPipe alloc] init]; // pipe for shell input
     
     [task setStandardInput:inPipe];
-    [task setLaunchPath:shFile];
-    
-    NSArray* args = [NSArray arrayWithObjects:className, xmlFile, savePath, nil];
+    [task setLaunchPath:@"/bin/sh"];
+    NSArray* args = [NSArray arrayWithObjects:shFile, className, xmlFile, savePath, nil];
     [task setArguments:args];
     
     
