@@ -521,7 +521,7 @@ void KeySettingWindow::createUI()
     addChild(bg);
     
     
-    Label* label = Label::createWithTTF("키값 입력", "fonts/SeoulNamsanEB_0.ttf", 30);
+    Label* label = Label::createWithTTF("키값 입력 (키값 == 변수명)", "fonts/SeoulNamsanEB_0.ttf", 30);
     label->setPosition(Vec2(640, 440));
     addChild(label);
     
