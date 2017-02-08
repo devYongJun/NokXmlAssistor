@@ -12,6 +12,7 @@
 #include "cocos2d.h"
 #include "cocos-ext.h"
 #include "ui/UIScrollView.h"
+#include "SelectResoureRootScene.hpp"
 
 class SelectXmlScene : public cocos2d::Layer, cocos2d::ui::EditBoxDelegate
 {
@@ -39,6 +40,11 @@ public:
     cocos2d::ui::ScrollView* _scroll;
     
     float _scrollStartY;
+    cocos2d::Vec2 _containerPos;
+    
+private:
+    void makeScrollContents();
+    void createReturnToPrevSceneBtn();
 };
 
 #endif /* SelectXmlScene_hpp */

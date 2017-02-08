@@ -34,12 +34,15 @@ bool SelectXmlScene::init()
     }
     
     _screenSize = Director::getInstance()->getWinSize();
+    _containerPos = Vec2::ONE;
     
     createGradient();
     
     createScroll();
     
     createSearchBox();
+    
+    createReturnToPrevSceneBtn();
     
     return true;
 }
@@ -83,8 +86,6 @@ void SelectXmlScene::createScroll()
     addChild(text);
     
     // create scroll
-    static Vec2 containerPos = Vec2::ONE;
-    
     _scroll = ui::ScrollView::create();
     _scroll->setDirection(cocos2d::ui::ScrollView::Direction::VERTICAL);
     _scroll->setContentSize(Size(Director::getInstance()->getWinSize().width / 2,
@@ -98,9 +99,25 @@ void SelectXmlScene::createScroll()
     // xml read
     _xmlList = YJFileReader::create()->getXmlFileList();
     
+    makeScrollContents();
+    
+    if(_containerPos != Vec2::ONE)
+    {
+        _scroll->setInnerContainerPosition(_containerPos);
+    }
+    else
+    {
+        _scrollStartY = _scroll->getInnerContainerPosition().y;
+        CCLOG("_scrollStartY : %f", _scrollStartY);
+    }
+
+}
+
+void SelectXmlScene::makeScrollContents()
+{
     Sprite* sample = Sprite::create("btn.png");
     float width = Director::getInstance()->getWinSize().width;
-    float height = (sample->getContentSize().height+2) * 100;
+    float height = sample->getContentSize().height * _xmlList.size();
     for(int i = 0; i < _xmlList.size(); i++)
     {
         ui::Button* btn = ui::Button::create("btn.png");
@@ -111,7 +128,7 @@ void SelectXmlScene::createScroll()
         btn->setPosition(Vec2(0, height - (i * btn->getContentSize().height)));
         btn->addClickEventListener([=](Ref* s){
             
-            containerPos = _scroll->getInnerContainerPosition();
+            _containerPos = _scroll->getInnerContainerPosition();
             std::string xmlPath = UserDefault::getInstance()->getStringForKey("KEY_XML_PATH").append("/").append(btn->getTitleText());
             UserDefault::getInstance()->setStringForKey("CUR_XML_PATH", xmlPath);
             
@@ -121,18 +138,27 @@ void SelectXmlScene::createScroll()
         });
         _scroll->addChild(btn);
     }
-    _scroll->setInnerContainerSize(Size(width*2, height));
     
-    if(containerPos != Vec2::ONE)
-    {
-        _scroll->setInnerContainerPosition(containerPos);
-    }
-    else
-    {
-        _scrollStartY = _scroll->getInnerContainerPosition().y;
-        CCLOG("_scrollStartY : %f", _scrollStartY);
-    }
+    _scroll->setInnerContainerSize(Size(width*2, height));
+}
 
+void SelectXmlScene::createReturnToPrevSceneBtn()
+{
+    auto btn = ui::Button::create("btn.png");
+    btn->setTitleText("뒤로");
+    btn->setScale(0.5f);
+    btn->setTitleFontSize(40);
+    btn->setTitleColor(Color3B::RED);
+    btn->setAnchorPoint(Vec2::ANCHOR_TOP_RIGHT);
+    btn->setPosition(Vec2(Director::getInstance()->getWinSize() * 0.98));
+    btn->addClickEventListener([=](Ref* pSender){
+        auto scene = SelectResoureRootScene::createScene();
+        if( scene )
+        {
+            Director::getInstance()->replaceScene(scene);
+        }
+    });
+    addChild(btn);
 }
 
 void SelectXmlScene::createSearchBox()
@@ -148,7 +174,7 @@ void SelectXmlScene::createSearchBox()
     editBox->setFontColor(Color3B::BLACK);
     editBox->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     editBox->setPosition(Vec2(900, 400));
-    
+    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
     editBox->setDelegate(this);
     addChild(editBox, 100);
 }

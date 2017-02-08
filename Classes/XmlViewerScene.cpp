@@ -532,6 +532,7 @@ void KeySettingWindow::createUI()
     editBox->setFontColor(Color3B::BLACK);
     editBox->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     editBox->setPosition(Vec2(640, 360));
+    editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
     addChild(editBox);
     
     Label* prep = Label::createWithTTF("btn + ", "fonts/SeoulNamsanEB_0.ttf", 100);
@@ -628,6 +629,7 @@ void CodeConfigWindow::createUI()
     editBoxClassName->setFontColor(Color3B::BLACK);
     editBoxClassName->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
     editBoxClassName->setPosition(Vec2(1280/2, 360));
+    editBoxClassName->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
     addChild(editBoxClassName);
     
     ui::Button* btnGenerate = ui::Button::create("btn.png");

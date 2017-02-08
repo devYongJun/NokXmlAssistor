@@ -76,6 +76,7 @@ public:
     CC_SYNTHESIZE(std::function<void(void)>, _callbackClose, CallbackClose);
     
     CREATE_FUNC(CustomOptionWindow);
+    
 private:
     
     void onEnter();
@@ -91,6 +92,7 @@ public:
     
     CC_SYNTHESIZE(std::function<void(std::string, bool)>, _callbackKey, CallbackKey);
     CREATE_FUNC(KeySettingWindow);
+    
 private:
     
     void onEnter();
@@ -107,6 +109,7 @@ public:
     
     CC_SYNTHESIZE(std::function<void(std::string)>, _callbackConfig, CallbackConfig);
     CREATE_FUNC(CodeConfigWindow);
+    
 private:
     void onEnter();
     void createUI();
