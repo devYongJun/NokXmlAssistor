@@ -54,6 +54,8 @@ XmlViewerScene::XmlViewerScene(const char* xmlFile)
 ,_labelMouseLocalPosition(nullptr)
 ,_labelMouseWorldAnchor(nullptr)
 ,_labelMouseLocalAnchor(nullptr)
+,_labelImageName(nullptr)
+,_labelKeyValue(nullptr)
 ,_currentTarget(nullptr)
 ,_localLine(nullptr)
 ,_optionWindow(nullptr)
@@ -95,6 +97,21 @@ void XmlViewerScene::onEnter()
     _labelMouseLocalPosition->setPosition(100, 0);
     _labelMouseLocalPosition->enableOutline(Color4B::BLACK);
     _labelLayer->addChild(_labelMouseLocalPosition);
+    
+    // selected Image Name
+    _labelImageName = Label::createWithTTF(ttfConfig, "");
+    _labelImageName->setTextColor(Color4B::WHITE);
+    _labelImageName->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    _labelImageName->enableOutline(Color4B::BLACK);
+    _labelImageName->setPosition(0, 60);
+    _labelLayer->addChild(_labelImageName);
+    
+    _labelKeyValue = Label::createWithTTF(ttfConfig, "");
+    _labelKeyValue->setTextColor(Color4B::WHITE);
+    _labelKeyValue->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
+    _labelKeyValue->setPosition(0, -60);
+    _labelKeyValue->enableOutline(Color4B::BLACK);
+    _labelLayer->addChild(_labelKeyValue);
     
     _localLine = DrawNode::create();
     _localLine->setPosition(_uiRootPosition);
@@ -161,10 +178,11 @@ void XmlViewerScene::onMouseDown(cocos2d::EventMouse* event)
                           event->getCursorY() - _uiRootPosition.y);
     
     auto detect = detectImage(cursorPos);
+    auto detectSpr = get<1>(detect);
     
     if(event->getMouseButton() == MOUSE_BUTTON_LEFT)
     {
-        if(detect)
+        if(detectSpr)
         {
             showPosition(detect, cursorPos);
         }
@@ -172,9 +190,9 @@ void XmlViewerScene::onMouseDown(cocos2d::EventMouse* event)
     }
     else if(event->getMouseButton() == MOUSE_BUTTON_RIGHT)
     {
-        if(detect)
+        if(detectSpr)
         {
-            showTarget(detect);
+            showTarget(detectSpr);
         }
         _optionWindow->setPosition(cursorPos);
         _optionWindow->setVisible(true);
@@ -191,22 +209,36 @@ void XmlViewerScene::onMouseMove(cocos2d::EventMouse* event)
     }
 }
 
-cocos2d::Sprite* XmlViewerScene::detectImage(Vec2 cursorPos)
+_tplSprInfo XmlViewerScene::detectImage(Vec2 cursorPos)
 {
-    for(auto sprite : _vSprite)
+    for(auto item : _vSpriteTpl)
     {
+        auto sprite = get<1>(item);
         if(sprite->getBoundingBox().containsPoint(cursorPos))
         {
-            return sprite;
+            return item;
         }
     }
-    return nullptr;
+    return make_tuple(string(""), nullptr);
 }
 
+_tplSprInfo XmlViewerScene::getSpriteTpl(Sprite* spr)
+{
+    for(auto item : _vSpriteTpl)
+    {
+        auto sprite = get<1>(item);
+        if(sprite == spr)
+        {
+            return item;
+        }
+    }
+    return make_tuple(string(""), nullptr);
+}
 
-void XmlViewerScene::showPosition(Sprite* sprite, Vec2 cursorPos)
+void XmlViewerScene::showPosition(std::tuple<std::string,cocos2d::Sprite*> detectItem, Vec2 cursorPos)
 {
     
+    auto sprite = get<1>(detectItem);
     // world position text
     _labelMouseWorldPosition->setString(StringUtils::format("world Position\n(%.0f,%.0f)\n(%.3f,%.3f)",
                                                             cursorPos.x,
@@ -222,6 +254,18 @@ void XmlViewerScene::showPosition(Sprite* sprite, Vec2 cursorPos)
                                                             localY,
                                                             localX / sprite->getContentSize().width,
                                                             localY / sprite->getContentSize().height));
+    
+    // selected Image name
+    string tok("UI_Resources");
+    string baseStr = sprite->getResourceName();
+    auto findPtr = baseStr.find(tok);
+    
+    if( findPtr != string::npos )
+        baseStr.erase(0, findPtr);
+    
+    _labelImageName->setString(StringUtils::format("Resource Path\n\"%s\"",baseStr.c_str()));
+    
+    _labelKeyValue->setString(StringUtils::format("XML Key Value\n\"%s\"", get<0>(detectItem).c_str()));
     
     // local position draw
     _localLine->clear();
@@ -244,6 +288,8 @@ void XmlViewerScene::showTarget(Sprite *sprite)
     
     _labelMouseWorldPosition->setString("");
     _labelMouseLocalPosition->setString("");
+    _labelImageName->setString("");
+    _labelKeyValue->setString("");
     
     // local position draw
     _localLine->clear();
@@ -284,6 +330,7 @@ void XmlViewerScene::loadXml(const char* xmlFile)
         // 오브젝트들
         for(pugi::xml_node node = root_node.first_child(); node; node = node.next_sibling())
         {
+            string nodeId = node.attribute("id").as_string();
             string strImg = node.attribute("img").as_string();
             string replaceStrImg = "";
             size_t findOffset = 0;
@@ -304,7 +351,7 @@ void XmlViewerScene::loadXml(const char* xmlFile)
             
             int cutPos = strImg.find_first_of('/');
             string imgPath = strImg.substr(cutPos, strImg.length());
-            string fullPath = StringUtils::format("%s/%s",rootPath.c_str(),imgPath.c_str());
+            string fullPath = StringUtils::format("%s%s",rootPath.c_str(),imgPath.c_str());
     
             Sprite* sprite = Sprite::create(fullPath);
             if(sprite)
@@ -313,11 +360,11 @@ void XmlViewerScene::loadXml(const char* xmlFile)
                 sprite->setPosition(posX, posY);
                 sprite->setName(imgPath);
                 base->addChild(sprite);
-                _vSprite.pushBack(sprite);
+                _vSpriteTpl.push_back(make_tuple(nodeId, sprite));
             }
         }
     }
-    _vSprite.reverse();
+    reverse(_vSpriteTpl.begin(), _vSpriteTpl.end());
     
     base->setIgnoreAnchorPointForPosition(false);
     base->setAnchorPoint(Vec2::ANCHOR_MIDDLE);

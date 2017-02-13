@@ -12,6 +12,8 @@
 class CustomOptionWindow;
 class KeySettingWindow;
 class CodeConfigWindow;
+
+typedef std::tuple<std::string,cocos2d::Sprite*> _tplSprInfo;
 class XmlViewerScene : public cocos2d::Layer
 {
 public:
@@ -29,8 +31,8 @@ private:
     void onMouseMove(cocos2d::EventMouse* event);
     
     bool usingPopup();
-    cocos2d::Sprite* detectImage(cocos2d::Vec2 cursorPos);
-    void showPosition(cocos2d::Sprite* sprite, cocos2d::Vec2 cursorPos);
+    _tplSprInfo detectImage(cocos2d::Vec2 cursorPos);
+    void showPosition(_tplSprInfo detectItem, cocos2d::Vec2 cursorPos);
     void showTarget(cocos2d::Sprite* sprite);
     
     void loadXml(const char* xmlFile);
@@ -49,8 +51,12 @@ private:
     cocos2d::Label* _labelMouseLocalPosition;
     cocos2d::Label* _labelMouseLocalAnchor;
     
+    // Image Name / key name
+    cocos2d::Label* _labelImageName;
+    cocos2d::Label* _labelKeyValue;
+    
     cocos2d::Layer* _labelLayer;
-    cocos2d::Vector<cocos2d::Sprite*> _vSprite;
+    std::vector<_tplSprInfo> _vSpriteTpl;
     
     cocos2d::Sprite* _currentTarget;
     
@@ -62,7 +68,8 @@ private:
     KeySettingWindow* _keySettingWindow;
     CodeConfigWindow* _codeConfigWindow;
     
-    
+public:
+    _tplSprInfo getSpriteTpl(cocos2d::Sprite* spr);
 };
 
 
