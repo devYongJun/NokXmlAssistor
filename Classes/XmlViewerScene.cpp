@@ -61,8 +61,6 @@ XmlViewerScene::XmlViewerScene(const char* xmlFile)
 ,_optionWindow(nullptr)
 ,_keySettingWindow(nullptr)
 {
-    _screenSize = Director::getInstance()->getWinSize();
-    
     loadXml(xmlFile);
 }
 
@@ -325,7 +323,7 @@ void XmlViewerScene::loadXml(const char* xmlFile)
         int width = root_node.attribute("width").as_int();
         int height = root_node.attribute("height").as_int();
         base->setContentSize(Size(width, height));
-        
+        _screenSize = Size(width, height);
         _uiRootPosition = Vec2(640 - (width * 0.5f), 360 - (height * 0.5f));
         // 오브젝트들
         for(pugi::xml_node node = root_node.first_child(); node; node = node.next_sibling())
@@ -334,6 +332,9 @@ void XmlViewerScene::loadXml(const char* xmlFile)
             string strImg = node.attribute("img").as_string();
             string replaceStrImg = "";
             size_t findOffset = 0;
+            if( strImg == "" )
+                continue;
+            
             while(true)
             {
                 findOffset = strImg.find("\\",findOffset);
@@ -350,6 +351,9 @@ void XmlViewerScene::loadXml(const char* xmlFile)
             string rootPath = UserDefault::getInstance()->getStringForKey("KEY_RESOURCE_PATH");
             
             int cutPos = strImg.find_first_of('/');
+            if( cutPos == -1 )
+                continue;
+            
             string imgPath = strImg.substr(cutPos, strImg.length());
             string fullPath = StringUtils::format("%s%s",rootPath.c_str(),imgPath.c_str());
     
