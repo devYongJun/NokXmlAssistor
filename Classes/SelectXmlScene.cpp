@@ -35,6 +35,7 @@ bool SelectXmlScene::init()
     
     _screenSize = Director::getInstance()->getWinSize();
     _containerPos = Vec2::ONE;
+    _countLabel = nullptr;
     
     createGradient();
     
@@ -94,12 +95,15 @@ void SelectXmlScene::createScroll()
     _scroll->setPosition(Vec2::ZERO);
     addChild(_scroll);
     
-    
+    _countLabel = Label::createWithTTF("Item Count : 0", "fonts/SeoulNamsanEB_0.ttf", 18);
+    _countLabel->setPosition(Vec2(500, 680));
+    addChild(_countLabel);
     
     // xml read
     _xmlList = YJFileReader::create()->getXmlFileList();
+    _findXmlList = _xmlList;
     
-    makeScrollContents();
+    resetScroll();
     
     if(_containerPos != Vec2::ONE)
     {
@@ -115,13 +119,15 @@ void SelectXmlScene::createScroll()
 
 void SelectXmlScene::makeScrollContents()
 {
+    _scroll->removeAllChildrenWithCleanup(true);
+    
     Sprite* sample = Sprite::create("btn.png");
     float width = Director::getInstance()->getWinSize().width;
-    float height = sample->getContentSize().height * _xmlList.size();
-    for(int i = 0; i < _xmlList.size(); i++)
+    float height = sample->getContentSize().height * _findXmlList.size();
+    for(int i = 0; i < _findXmlList.size(); i++)
     {
         ui::Button* btn = ui::Button::create("btn.png");
-        btn->setTitleText(_xmlList.at(i));
+        btn->setTitleText(_findXmlList.at(i));
         btn->setTitleFontSize(22);
         btn->setTitleColor(Color3B::BLACK);
         btn->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
@@ -139,7 +145,17 @@ void SelectXmlScene::makeScrollContents()
         _scroll->addChild(btn);
     }
     
+    _countLabel->setString(StringUtils::format("Item Count : %d", _findXmlList.size()));
     _scroll->setInnerContainerSize(Size(width*2, height));
+}
+
+void SelectXmlScene::resetScroll()
+{
+    if( _scroll == nullptr )
+        return;
+    
+    makeScrollContents();
+    
 }
 
 void SelectXmlScene::createReturnToPrevSceneBtn()
@@ -185,22 +201,25 @@ void SelectXmlScene::editBoxTextChanged(cocos2d::ui::EditBox* editBox, const std
 {
     _scroll->stopAutoScroll();
     
-    int findIndex = -1;
-    for(int i = 0; i < _xmlList.size(); i++)
+    _findXmlList.clear();
+    
+//    int findIndex = -1;
+//    for(int i = 0; i < _xmlList.size(); i++)
+//    {
+//        if(_xmlList.at(i).find(text) != std::string::npos)
+//        {
+//            findIndex = i;
+//            break;
+//        }
+//    }
+    
+    for( auto item : _xmlList )
     {
-        if(_xmlList.at(i).find(text) != std::string::npos)
-        {
-            findIndex = i;
-            break;
-        }
+        if( item.find(text) != std::string::npos )
+            _findXmlList.push_back(item);
     }
     
-    if(findIndex >= 0 && findIndex < _scroll->getChildrenCount())
-    {
-        Vec2 findPos = _scroll->getChildren().at(findIndex)->getPosition();
-        _scroll->setInnerContainerPosition(Vec2(0, -findPos.y + (_scroll->getContentSize().height)));
-    }
-    
+    resetScroll();
 }
 
 void SelectXmlScene::editBoxReturn(cocos2d::ui::EditBox* editBox)

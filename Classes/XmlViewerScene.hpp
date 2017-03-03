@@ -38,6 +38,7 @@ private:
     void loadXml(const char* xmlFile);
     void settingXml();
     void settingCode();
+    void hideSprite();
     void callbackKey(std::string key, bool isButton);
     void callbackCodeConfig(std::string className);
     
@@ -81,6 +82,7 @@ public:
     CC_SYNTHESIZE(std::function<void(void)>, _callbackSetting, CallbackSetting);
     CC_SYNTHESIZE(std::function<void(void)>, _callbackGenerateCode, CallbackGenerateCode);
     CC_SYNTHESIZE(std::function<void(void)>, _callbackClose, CallbackClose);
+    CC_SYNTHESIZE(std::function<void(void)>, _callBackHide, CallbackHide);
     
     CREATE_FUNC(CustomOptionWindow);
     

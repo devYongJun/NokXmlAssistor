@@ -34,8 +34,10 @@ public:
     CREATE_FUNC(SelectXmlScene);
     
     cocos2d::Size _screenSize;
+    cocos2d::Label* _countLabel;
     
     std::vector<std::string> _xmlList;
+    std::vector<std::string> _findXmlList;
     
     cocos2d::ui::ScrollView* _scroll;
     
@@ -44,6 +46,7 @@ public:
     
 private:
     void makeScrollContents();
+    void resetScroll();
     void createReturnToPrevSceneBtn();
 };
 
