@@ -126,6 +126,9 @@ void XmlViewerScene::onEnter()
     _optionWindow->setCallbackClose([=]() {
         Director::getInstance()->popScene();
     });
+    _optionWindow->setCallbackHide([=](){
+        hideSprite();
+    });
     
     _optionWindow->setVisible(false);
     addChild(_optionWindow, INT_MAX);
@@ -393,6 +396,17 @@ void XmlViewerScene::settingCode()
     _codeConfigWindow->setVisible(true);
 }
 
+void XmlViewerScene::hideSprite()
+{
+    if( _currentTarget != nullptr )
+    {
+        _currentTarget->setVisible(false);
+        _currentTarget->setPosition(Director::getInstance()->getWinSize());
+        showTarget(_currentTarget);
+        _optionWindow->setVisible(false);
+    }
+}
+
 void XmlViewerScene::callbackKey(std::string key, bool isButton)
 {
     if(_currentTarget == nullptr)
@@ -507,11 +521,13 @@ void CustomOptionWindow::createUI()
     LayerColor* popBG = LayerColor::create(Color4B(0,0,0,175), w, h);
     addChild(popBG);
     
-    string names[3] = { "키값 설정하기", "코드 생성하기", "선택화면으로 이동" };
-    Color3B colors[3] = { Color3B::GREEN, Color3B::BLUE, Color3B::RED };
-    function<void(void)> funcs[3] = {_callbackSetting, _callbackGenerateCode, _callbackClose };
+    const int ITEM_COUNT = 4;
     
-    for(int i = 0; i < 3; i++)
+    string names[ITEM_COUNT] = { "키값 설정하기", "코드 생성하기", "선택화면으로 이동", "이 이미지 숨기기"};
+    Color3B colors[ITEM_COUNT] = { Color3B::GREEN, Color3B::BLUE, Color3B::RED, Color3B::BLACK };
+    function<void(void)> funcs[ITEM_COUNT] = {_callbackSetting, _callbackGenerateCode, _callbackClose, _callBackHide};
+    
+    for(int i = 0; i < ITEM_COUNT; i++)
     {
         int index = i;
         ui::Button* btnItem = ui::Button::create("btn.png");
