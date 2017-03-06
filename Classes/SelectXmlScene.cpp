@@ -36,6 +36,7 @@ bool SelectXmlScene::init()
     _screenSize = Director::getInstance()->getWinSize();
     _containerPos = Vec2::ONE;
     _countLabel = nullptr;
+    _sprCaseSen = nullptr;
     
     createGradient();
     
@@ -179,7 +180,7 @@ void SelectXmlScene::createReturnToPrevSceneBtn()
 
 void SelectXmlScene::createSearchBox()
 {
-    Label* label = Label::createWithTTF("검색 (대소문자 구분)", "fonts/SeoulNamsanEB_0.ttf", 20);
+    Label* label = Label::createWithTTF("검색", "fonts/SeoulNamsanEB_0.ttf", 20);
     label->setPosition(900, 500);
     addChild(label, 100);
     
@@ -193,6 +194,24 @@ void SelectXmlScene::createSearchBox()
     editBox->setInputMode(ui::EditBox::InputMode::SINGLE_LINE);
     editBox->setDelegate(this);
     addChild(editBox, 100);
+    
+    _sprCaseSen = Sprite::create("res/check.png");
+    _sprCaseSen->setPosition(Vec2(900, 470));
+    _sprCaseSen->setVisible(false);
+    addChild(_sprCaseSen, 101);
+    
+    auto btn = ui::Button::create("res/checkbox.png");
+    btn->setPosition(_sprCaseSen->getPosition());
+    btn->addClickEventListener([=](Ref* pSender) {
+        _sprCaseSen->setVisible(!_sprCaseSen->isVisible());
+        this->editBoxTextChanged(editBox, editBox->getText());
+    });
+    addChild(btn, 100);
+    
+    auto caseLb = Label::createWithTTF("Case Sensitive", "fonts/SeoulNamsanEB_0.ttf", 20);
+    caseLb->setAnchorPoint(Vec2::ANCHOR_MIDDLE_LEFT);
+    caseLb->setPosition(Vec2(925, 470));
+    addChild(caseLb, 100);
 }
 
 
@@ -203,19 +222,24 @@ void SelectXmlScene::editBoxTextChanged(cocos2d::ui::EditBox* editBox, const std
     
     _findXmlList.clear();
     
-//    int findIndex = -1;
-//    for(int i = 0; i < _xmlList.size(); i++)
-//    {
-//        if(_xmlList.at(i).find(text) != std::string::npos)
-//        {
-//            findIndex = i;
-//            break;
-//        }
-//    }
-    
     for( auto item : _xmlList )
     {
-        if( item.find(text) != std::string::npos )
+        std::string findingText(text);
+
+        for( auto itemChar : item )
+        {
+            bool cond;
+            
+            if( _sprCaseSen->isVisible() )
+                cond = (itemChar == findingText[0]);
+            else
+                cond = (tolower(itemChar) == tolower(findingText[0]));
+            
+            if( cond )
+                findingText.erase(0, 1);
+        }
+        
+        if( findingText.size() == 0 )
             _findXmlList.push_back(item);
     }
     

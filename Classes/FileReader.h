@@ -19,7 +19,7 @@ public:
     
     std::vector<std::string> getXmlFileList();
     void runCodeGenerateShell(std::string xmlFile, std::string className);
-    
+    std::string setXmlFolder();
 private:
     static YJFileReader* _instance;
     

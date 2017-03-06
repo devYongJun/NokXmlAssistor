@@ -17,6 +17,7 @@
 +(IOSFileReader*) getInstance;
 -(NSMutableArray*) getFileList:(std::string) xmlPath;
 -(void) runCodeGenerateShell:(NSString*)xmlFile className:(NSString*)className;
+-(NSString*) selectXmlFolder;
 @end
 
 static IOSFileReader* _iosFileReaderInstance = nullptr;
@@ -83,6 +84,24 @@ static IOSFileReader* _iosFileReaderInstance = nullptr;
 
 }
 
+- (NSString*)selectXmlFolder {
+    NSOpenPanel *panel = [NSOpenPanel openPanel];
+    [panel setCanChooseFiles:NO];
+    [panel setCanChooseDirectories:YES];
+    [panel setAllowsMultipleSelection:NO];
+    
+    // display the panel
+    NSInteger clicked = [panel runModal];
+     
+    if (clicked == NSFileHandlingPanelOKButton) {
+//        return [NSString stringWithFormat:@"%@", theDocument];
+        
+        return [[[panel URLs]objectAtIndex:0] absoluteString];
+    }
+    
+    return @"";
+}
+
 @end
 
 
@@ -119,7 +138,10 @@ void YJFileReader::runCodeGenerateShell(std::string xmlFile, std::string classNa
                                             className:[NSString stringWithCString:className.c_str() encoding:NSUTF8StringEncoding]];
 }
 
-
+std::string YJFileReader::setXmlFolder()
+{
+    return [[[IOSFileReader getInstance] selectXmlFolder] UTF8String];
+}
 
 
 

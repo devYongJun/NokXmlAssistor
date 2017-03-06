@@ -44,10 +44,13 @@ public:
     float _scrollStartY;
     cocos2d::Vec2 _containerPos;
     
+    cocos2d::Sprite* _sprCaseSen;
+    
 private:
     void makeScrollContents();
     void resetScroll();
     void createReturnToPrevSceneBtn();
+    
 };
 
 #endif /* SelectXmlScene_hpp */

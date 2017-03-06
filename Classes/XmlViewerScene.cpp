@@ -357,9 +357,14 @@ void XmlViewerScene::loadXml(const char* xmlFile)
             if( cutPos == -1 )
                 continue;
             
-            string imgPath = strImg.substr(cutPos, strImg.length());
+            string imgPath = strImg;
+            
+            
+            if( string(strImg, 0, 12) == "UI_Resources" )
+                imgPath = strImg.substr(cutPos, strImg.length());
+
             string fullPath = StringUtils::format("%s%s",rootPath.c_str(),imgPath.c_str());
-    
+            
             Sprite* sprite = Sprite::create(fullPath);
             if(sprite)
             {
@@ -517,7 +522,7 @@ void CustomOptionWindow::onEnter()
 void CustomOptionWindow::createUI()
 {
     float w = 200.0f;
-    float h = 180.0f;
+    float h = 220.0f;
     LayerColor* popBG = LayerColor::create(Color4B(0,0,0,175), w, h);
     addChild(popBG);
     
@@ -536,7 +541,7 @@ void CustomOptionWindow::createUI()
         btnItem->setTitleFontSize(40);
         btnItem->setTitleFontName("fonts/SeoulNamsanEB_0.ttf");
         btnItem->setScale(0.4f);
-        btnItem->setPosition(Vec2(w/2, h - ((h / 4) * (index+1))));
+        btnItem->setPosition(Vec2(w/2, h - ((h / 5) * (index+1))));
         btnItem->addClickEventListener([=](Ref* s){
             CCLOG("func:%d", index);
             funcs[index]();
