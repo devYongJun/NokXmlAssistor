@@ -17,12 +17,12 @@ typedef std::tuple<std::string,cocos2d::Sprite*> _tplSprInfo;
 class XmlViewerScene : public cocos2d::Layer
 {
 public:
-    static cocos2d::Scene* createScene(const char* xmlFile);
-    static XmlViewerScene* create(const char* xmlFile);
+    static cocos2d::Scene* createScene(const char* xmlFile, std::string baseRootPath);
+    static XmlViewerScene* create(const char* xmlFile, std::string baseRootPath);
     virtual bool init();
     
 private:
-    XmlViewerScene(const char* xmlFile);
+    XmlViewerScene(const char* xmlFile, std::string baseRootPath);
     virtual ~XmlViewerScene();
     
     void onEnter();
@@ -68,6 +68,8 @@ private:
     CustomOptionWindow* _optionWindow;
     KeySettingWindow* _keySettingWindow;
     CodeConfigWindow* _codeConfigWindow;
+    
+    std::string _baseRootPath;
     
 public:
     _tplSprInfo getSpriteTpl(cocos2d::Sprite* spr);

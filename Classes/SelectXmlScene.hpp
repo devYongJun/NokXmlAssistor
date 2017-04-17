@@ -51,6 +51,8 @@ private:
     void resetScroll();
     void createReturnToPrevSceneBtn();
     
+    std::string selectedXmlPath;
+    std::string basedRootPath;
 };
 
 #endif /* SelectXmlScene_hpp */

@@ -37,6 +37,9 @@ bool SelectXmlScene::init()
     _containerPos = Vec2::ONE;
     _countLabel = nullptr;
     _sprCaseSen = nullptr;
+
+    selectedXmlPath = UserDefault::getInstance()->getStringForKey("KEY_XML_PATH");
+    basedRootPath = UserDefault::getInstance()->getStringForKey("KEY_RESOURCE_PATH");
     
     createGradient();
     
@@ -136,10 +139,8 @@ void SelectXmlScene::makeScrollContents()
         btn->addClickEventListener([=](Ref* s){
             
             _containerPos = _scroll->getInnerContainerPosition();
-            std::string xmlPath = UserDefault::getInstance()->getStringForKey("KEY_XML_PATH").append("/").append(btn->getTitleText());
-            UserDefault::getInstance()->setStringForKey("CUR_XML_PATH", xmlPath);
-            
-            auto scene = XmlViewerScene::createScene(xmlPath.c_str());
+            auto rootPath = selectedXmlPath;
+            auto scene = XmlViewerScene::createScene(rootPath.append("/").append(btn->getTitleText()).c_str(), basedRootPath);
             Director::getInstance()->pushScene(scene);
             
         });

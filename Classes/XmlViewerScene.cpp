@@ -18,10 +18,10 @@ using namespace std;
 
 
 
-Scene* XmlViewerScene::createScene(const char* xmlFile)
+Scene* XmlViewerScene::createScene(const char* xmlFile, std::string baseRootPath)
 {
     auto scene = Scene::create();
-    auto layer = XmlViewerScene::create(xmlFile);
+    auto layer = XmlViewerScene::create(xmlFile, baseRootPath);
     
     scene->addChild(layer);
     return scene;
@@ -29,9 +29,9 @@ Scene* XmlViewerScene::createScene(const char* xmlFile)
 
 
 
-XmlViewerScene* XmlViewerScene::create(const char* xmlFile)
+XmlViewerScene* XmlViewerScene::create(const char* xmlFile, std::string baseRootPath)
 {
-    auto ret = new (nothrow) XmlViewerScene(xmlFile);
+    auto ret = new (nothrow) XmlViewerScene(xmlFile, baseRootPath);
     if(ret && ret->init())
     {
         ret->autorelease();
@@ -49,7 +49,7 @@ bool XmlViewerScene::init()
     return true;
 }
 
-XmlViewerScene::XmlViewerScene(const char* xmlFile)
+XmlViewerScene::XmlViewerScene(const char* xmlFile, std::string baseRootPath)
 :_labelMouseWorldPosition(nullptr)
 ,_labelMouseLocalPosition(nullptr)
 ,_labelMouseWorldAnchor(nullptr)
@@ -60,6 +60,7 @@ XmlViewerScene::XmlViewerScene(const char* xmlFile)
 ,_localLine(nullptr)
 ,_optionWindow(nullptr)
 ,_keySettingWindow(nullptr)
+,_baseRootPath(baseRootPath)
 {
     loadXml(xmlFile);
 }
@@ -351,7 +352,7 @@ void XmlViewerScene::loadXml(const char* xmlFile)
             float posX = node.attribute("openglX").as_float();
             float posY = node.attribute("openglY").as_float();
             
-            string rootPath = UserDefault::getInstance()->getStringForKey("KEY_RESOURCE_PATH");
+            string rootPath = _baseRootPath;
             
             int cutPos = strImg.find_first_of('/');
             if( cutPos == -1 )
